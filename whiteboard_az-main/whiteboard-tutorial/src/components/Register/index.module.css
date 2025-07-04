@@ -1,0 +1,118 @@
+.registerContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    position: relative;
+    background: #000;
+    overflow: hidden;
+}
+
+.registerContainer::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    background: radial-gradient(circle at 60% 40%, #a259f7 0%, transparent 70%);
+    opacity: 0.18;
+    filter: blur(40px);
+    animation: moveGlow 8s ease-in-out infinite alternate;
+    z-index: 0;
+    pointer-events: none;
+}
+
+@keyframes moveGlow {
+    0% { background-position: 60% 40%; }
+    100% { background-position: 40% 60%; }
+}
+
+.welcomeTitle {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.contentWrapper {
+    z-index: 2;
+    width: 100%;
+    max-width: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 60px auto 0 auto;
+}
+
+.registerForm {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    padding: 20px;
+    background-color: #181818;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.registerForm input {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background: #222;
+    color: #fff;
+}
+
+.registerForm input::placeholder {
+    color: #aaa;
+}
+
+.registerForm button {
+    padding: 10px;
+    background-color: #42b72a;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.registerForm button:hover {
+    background-color: #36a420;
+}
+
+.navButton {
+    margin: 16px auto 0 auto;
+    padding: 10px 28px;
+    display: block;
+    background: linear-gradient(90deg, #1877f2, #42b72a);
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.navButton:hover {
+    background: linear-gradient(90deg, #42b72a, #1877f2);
+    transform: translateY(-2px) scale(1.03);
+}
+
+.waveEffect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    min-width: 100%;
+    height: 140px;
+    z-index: 1;
+    filter: drop-shadow(0 0 32px #a259f7) drop-shadow(0 0 24px #a259f7);
+    pointer-events: none;
+}
+  
