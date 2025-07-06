@@ -3,7 +3,7 @@ services:
     name: whiteboard-frontend
     env: static
     buildCommand: npm install && npm run build
-    staticPublishPath: ./build
+    staticPublishPath: build
     envVars:
       - key: REACT_APP_API_URL
         value: https://whiteboard5-5es6.onrender.com 
