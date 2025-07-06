@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
 import './index.min.css';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,7 @@ import { useParams } from 'react-router-dom';
 const Sidebar = () => {
   const [canvases, setCanvases] = useState([]);
   const token = localStorage.getItem('whiteboard_user_token');
-  const { canvasId, setCanvasId,setElements,setHistory, isUserLoggedIn, setUserLoginStatus} = useContext(boardContext);
+  const { canvasId, setCanvasId, isUserLoggedIn, setUserLoginStatus} = useContext(boardContext);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -17,69 +17,77 @@ const Sidebar = () => {
 
   const { id } = useParams(); 
 
-  useEffect(() => {
-    if (isUserLoggedIn) {
-      fetchCanvases();
-    }
-  }, [isUserLoggedIn]);
+  const handleCanvasClick = useCallback(async (id) => {
+    navigate(`/${id}`);
+  }, [navigate]);
 
-  useEffect(() => {}, []);
-
-  const fetchCanvases = async () => {
+  const handleCreateCanvas = useCallback(async () => {
     try {
-      const response = await axios.get('https://api-whiteboard-az.onrender.com/api/canvas/list', {
+      const response = await axios.post('https://whiteboard5-5es6.onrender.com/api/canvas/create', {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      console.log(response.data)  
+      // Refresh the canvas list
+      const listResponse = await axios.get('https://whiteboard5-5es6.onrender.com/api/canvas/list', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setCanvases(listResponse.data);
+      setCanvasId(response.data.canvasId);
+      navigate(`/${response.data.canvasId}`);
+    } catch (error) {
+      console.error('Error creating canvas:', error);
+      return null;
+    }
+  }, [token, setCanvasId, navigate]);
+
+  const fetchCanvases = useCallback(async () => {
+    try {
+      const response = await axios.get('https://whiteboard5-5es6.onrender.com/api/canvas/list', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCanvases(response.data);
       console.log(response.data)
       
       if (response.data.length === 0) {
-        const newCanvas = await handleCreateCanvas();
-        if (newCanvas) {
-          setCanvasId(newCanvas._id);
-          handleCanvasClick(newCanvas._id);
+        // Create a new canvas if none exist
+        try {
+          const createResponse = await axios.post('https://whiteboard5-5es6.onrender.com/api/canvas/create', {}, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const newCanvas = createResponse.data;
+          setCanvasId(newCanvas.canvasId);
+          navigate(`/${newCanvas.canvasId}`);
+        } catch (createError) {
+          console.error('Error creating canvas:', createError);
         }
       } else if (!canvasId && response.data.length > 0) {
         if(!id){
           setCanvasId(response.data[0]._id);
-          handleCanvasClick(response.data[0]._id);
+          navigate(`/${response.data[0]._id}`);
         }
       }
     } catch (error) {
       console.error('Error fetching canvases:', error);
     }
-  };
-
-  const handleCreateCanvas = async () => {
-    try {
-      const response = await axios.post('https://api-whiteboard-az.onrender.com/api/canvas/create', {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      console.log(response.data)  
-      fetchCanvases();
-      setCanvasId(response.data.canvasId);
-      handleCanvasClick(response.data.canvasId);
-    } catch (error) {
-      console.error('Error creating canvas:', error);
-      return null;
-    }
-  };
+  }, [token, setCanvasId, canvasId, id, navigate]);
 
   const handleDeleteCanvas = async (id) => {
     try {
-      await axios.delete(`https://api-whiteboard-az.onrender.com/api/canvas/delete/${id}`, {
+      await axios.delete(`https://whiteboard5-5es6.onrender.com/api/canvas/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      fetchCanvases();
-      setCanvasId(canvases[0]._id);
-      handleCanvasClick(canvases[0]._id);
+      // Refresh the canvas list
+      const listResponse = await axios.get('https://whiteboard5-5es6.onrender.com/api/canvas/list', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setCanvases(listResponse.data);
+      if (listResponse.data.length > 0) {
+        setCanvasId(listResponse.data[0]._id);
+        navigate(`/${listResponse.data[0]._id}`);
+      }
     } catch (error) {
       console.error('Error deleting canvas:', error);
     }
-  };
-
-  const handleCanvasClick = async (id) => {
-    navigate(`/${id}`);
   };
 
   const handleLogout = () => {
@@ -104,7 +112,7 @@ const Sidebar = () => {
       setSuccess(""); // Clear previous success message
 
       const response = await axios.put(
-        `https://api-whiteboard-az.onrender.com/api/canvas/share/${canvasId}`,
+        `https://whiteboard5-5es6.onrender.com/api/canvas/share/${canvasId}`,
         { email },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -122,6 +130,15 @@ const Sidebar = () => {
       }, 5000);
     }
   };
+
+  // Move useEffect after all function definitions
+  useEffect(() => {
+    if (isUserLoggedIn) {
+      fetchCanvases();
+    }
+  }, [isUserLoggedIn, fetchCanvases]);
+
+  useEffect(() => {}, []);
 
   return (
     <div className="sidebar">

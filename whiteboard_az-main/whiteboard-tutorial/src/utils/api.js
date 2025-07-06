@@ -4,7 +4,6 @@ import axios from "axios";
 const API_BASE_URL = "https://whiteboard5-5es6.onrender.com/api/canvas"; 
 
 const token = localStorage.getItem('whiteboard_user_token')
-const canvasId = localStorage.getItem('canvas_id')
 
 export const updateCanvas = async (canvasId, elements) => {
   try {

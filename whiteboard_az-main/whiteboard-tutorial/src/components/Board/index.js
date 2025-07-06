@@ -65,7 +65,7 @@ function Board({ id }) {
         socket.off("unauthorized");
       };
     }
-  }, [id]);
+  }, [id, setElements]);
 
   useEffect(() => {
     const fetchCanvasData = async () => {
@@ -85,7 +85,7 @@ function Board({ id }) {
     };
 
     fetchCanvasData();
-  }, [id, token]);
+  }, [id, token, setCanvasId, setElements, setHistory]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
